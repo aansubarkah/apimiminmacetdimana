@@ -23,10 +23,10 @@ class TwitsController extends AppController
     }
 
     public $settingsTwitter = [
-        'oauth_access_token' => '3555146480-sXfyGZDtrIDdzOMd1tt8srNWUijs7nCFfeag349',
-        'oauth_access_token_secret' => 'fKQN5cTbpDEvic613JtfHoVz7LC9dlSfUsP0yohuwboxY',
-        'consumer_key' => 'Bu8ZMGWX8LxqR0jjbCuKTvjfG',
-        'consumer_secret' => 'Fx43AKjpEksdAcG7y7SmDVH4Y2UfOVgQTzwmzSRInuPZaokGrX'
+        'oauth_access_token' => '3555146480-EVgv9OGkcVIgxUaIoM2shbgkKAQZaJNogBE5ovF',
+        'oauth_access_token_secret' => 'W78mlkW4mnNl92H7RO6eoDWtYwKU22F0sVxIyarvDqvxC',
+        'consumer_key' => 'exnjHqKAXhefmLcUL93M0wBqa',
+        'consumer_secret' => 'RLfNT2AeaTZZKs7RAGJCreK12rvSh98jTpGeM2l5maPYHgMQiF'
     ];
 
     private $baseTwitterUrl = 'https://api.twitter.com/1.1/';
@@ -264,7 +264,7 @@ class TwitsController extends AppController
                             array_key_exists('media', $data['extended_entities']) &&
                             $data['extended_entities']['media'][0]['type'] == 'photo'
                         ) {
-                            $dataToSave['twitImage'] = $data['extended_entities']['media'][0]['media_url'];
+                            $dataToSave['twitImage'] = $data['extended_entities']['media'][0]['media_url_https'];
                         }
 
                         // if url do exists

@@ -187,7 +187,7 @@ class UsersController extends AppController
                         'exp' => time() + 604800
                     ],
                     Security::salt())
-            ];
+                ];
         } else {
             $data = 'error!';
         }
@@ -215,18 +215,24 @@ class UsersController extends AppController
     public function token()
     {
         $user = $this->request->data;
-       $user = $this->Auth->identify();
-        if (!$user) {
-            throw new UnauthorizedException('Invalid username or password');
-        }
+        $query = $this->Users->find('all');
+        $query->select(['group_id']);
+        $query->where(['username' => $user['username']]);
+        $row = $query->first();
 
-        $this->set([
-            'token' => $token = \JWT::encode([
-                'id' => $user['id'],
-                'username' => $user['username'],
-                'email' => $user['email'],
-                'exp' => time() + 604800
-            ],
+        if($row->group_id == 1){
+            $user = $this->Auth->identify();
+            if (!$user) {
+                throw new UnauthorizedException('Invalid username or password');
+            }
+
+            $this->set([
+                'token' => $token = \JWT::encode([
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'email' => $user['email'],
+                    'exp' => time() + 604800
+                ],
                 Security::salt()
             ),
             //'username' => $user['username'],
@@ -235,6 +241,7 @@ class UsersController extends AppController
             '_serialize' => ['token', 'email']
             //'_serialize' => ['token']
         ]);
+        }
     }
 
     /**
