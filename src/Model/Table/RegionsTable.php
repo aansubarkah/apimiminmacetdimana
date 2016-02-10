@@ -1,20 +1,19 @@
 <?php
 namespace App\Model\Table;
 
-use App\Model\Entity\Respondent;
+use App\Model\Entity\Region;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
 /**
- * Respondents Model
+ * Regions Model
  *
- * @property \Cake\ORM\Association\HasMany $Markers
- * @property \Cake\ORM\Association\HasMany $Markerviews
- * @property \Cake\ORM\Association\BelongsTo $Regions
+ * @property \Cake\ORM\Association\HasMany $Users
+ * @property \Cake\ORM\Association\HasMany $Respondents
  */
-class RespondentsTable extends Table
+class RegionsTable extends Table
 {
 
     /**
@@ -27,20 +26,17 @@ class RespondentsTable extends Table
     {
         parent::initialize($config);
 
-        $this->table('respondents');
+        $this->table('regions');
         $this->displayField('name');
         $this->primaryKey('id');
 
-        $this->belongsTo('Regions', [
-            'foreignKey' => 'region_id',
-            'joinType' => 'INNER'
+        $this->hasMany('Users', [
+            'foreignKey' => 'region_id'
         ]);
-        $this->hasMany('Markers', [
-            'foreignKey' => 'respondent_id'
+        $this->hasMany('Respondents', [
+            'foreignKey' => 'region_id'
         ]);
-        $this->hasMany('Markerviews', [
-            'foreignKey' => 'respondent_id'
-        ]);
+
     }
 
     /**
@@ -52,18 +48,22 @@ class RespondentsTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
+            ->add('id', 'valid', ['rule' => 'numeric'])
             ->allowEmpty('id', 'create');
 
         $validator
-            ->allowEmpty('twitUserID');
+            ->add('lat', 'valid', ['rule' => 'numeric'])
+            ->requirePresence('lat', 'create')
+            ->notEmpty('lat');
+
+        $validator
+            ->add('lng', 'valid', ['rule' => 'numeric'])
+            ->requirePresence('lng', 'create')
+            ->notEmpty('lng');
 
         $validator
             ->requirePresence('name', 'create')
             ->notEmpty('name');
-
-        $validator
-            ->requirePresence('contact', 'create')
-            ->notEmpty('contact');
 
         $validator
             ->add('active', 'valid', ['rule' => 'boolean'])

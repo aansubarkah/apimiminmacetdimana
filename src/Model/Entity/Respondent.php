@@ -13,6 +13,7 @@ use Cake\ORM\Entity;
  * @property bool $active
  * @property \App\Model\Entity\Marker[] $markers
  * @property \App\Model\Entity\Markerview[] $markerviews
+ * @property \App\Model\Entity\Region $region
  */
 class Respondent extends Entity
 {

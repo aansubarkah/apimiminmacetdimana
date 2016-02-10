@@ -2,23 +2,19 @@
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
-use Cake\Auth\DefaultPasswordHasher;
 
 /**
- * User Entity.
+ * Region Entity.
  *
  * @property int $id
- * @property int $group_id
- * @property \App\Model\Entity\Group $group
- * @property string $username
- * @property string $email
- * @property string $password
+ * @property float $lat
+ * @property float $lng
+ * @property string $name
  * @property bool $active
- * @property \App\Model\Entity\Marker[] $markers
- * @property \App\Model\Entity\Markerview[] $markerviews
- * @property \App\Model\Entity\Region $region
+ * @property \App\Model\Entity\User[] $users
+ * @property \App\Model\Entity\Respondent[] $respondents
  */
-class User extends Entity
+class Region extends Entity
 {
 
     /**
@@ -34,9 +30,4 @@ class User extends Entity
         '*' => true,
         'id' => false,
     ];
-
-    protected function _setPassword($password)
-    {
-        return (new DefaultPasswordHasher)->hash($password);
-    }
 }
