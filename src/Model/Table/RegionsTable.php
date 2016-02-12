@@ -12,6 +12,7 @@ use Cake\Validation\Validator;
  *
  * @property \Cake\ORM\Association\HasMany $Users
  * @property \Cake\ORM\Association\HasMany $Respondents
+ * @property \Cake\ORM\Association\HasMany $Sources
  */
 class RegionsTable extends Table
 {
@@ -34,6 +35,9 @@ class RegionsTable extends Table
             'foreignKey' => 'region_id'
         ]);
         $this->hasMany('Respondents', [
+            'foreignKey' => 'region_id'
+        ]);
+        $this->hasMany('Sources', [
             'foreignKey' => 'region_id'
         ]);
 

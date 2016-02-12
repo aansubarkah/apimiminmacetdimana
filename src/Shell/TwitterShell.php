@@ -288,7 +288,7 @@ class TwitterShell extends Shell
             //$i = 1;
             foreach ($dataStream as $datum) {
                 $respondent = $this->Sources->Respondents->find()
-                    ->select(['id'])
+                    ->select(['id', 'region_id'])
                     ->where(['isOfficial' => 1, 'contact' => '@' . $datum['user']['screen_name']])
                     ->first();
                 $respondent_id = $respondent['id'];

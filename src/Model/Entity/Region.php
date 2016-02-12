@@ -13,6 +13,7 @@ use Cake\ORM\Entity;
  * @property bool $active
  * @property \App\Model\Entity\User[] $users
  * @property \App\Model\Entity\Respondent[] $respondents
+ * @property \App\Model\Entity\Source[] $sources
  */
 class Region extends Entity
 {
