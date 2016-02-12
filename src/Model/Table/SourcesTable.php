@@ -69,13 +69,13 @@ class SourcesTable extends Table
             ->requirePresence('info', 'create')
             ->notEmpty('info');
 
-        $validator
+        /*$validator
             ->requirePresence('url', 'create')
             ->notEmpty('url');
 
         $validator
             ->requirePresence('media', 'create')
-            ->notEmpty('media');
+            ->notEmpty('media');*/
 
         $validator
             ->add('isImported', 'valid', ['rule' => 'boolean'])

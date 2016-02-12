@@ -189,10 +189,13 @@ class SourcesController extends AppController
                     ) {
                         $dataToSave['media'] = $datum['extended_entities']['media'][0]['media_url_https'];
                     }
+                    /*
+                     * @todo why only media exists saving
+                     * */
                     // if url do exists
                     $twitURL = $this->findURLonText($info);
-                    if ($twitURL !== null) {
-                        $dataToSave['url'] = $twitURL;
+                    if ($twitURL[0] !== null) {
+                        $dataToSave['url'] = $twitURL[0];
                         $info = str_ireplace($twitURL, "", $info);
                         $info = trim($info);
                     }
@@ -207,13 +210,14 @@ class SourcesController extends AppController
                     // save twit to db
                     $source = $this->Sources->newEntity($dataToSave);
                     if ($this->Sources->save($source)) {
-                        $dataToDisplay[]= $dataToSave;
+                        //$dataToDisplay[]= $dataToSave;
                     } else {
                         //$errorsOccured[] = $this->Sources->validationErrors;
                     }
                 }
             }
         }
+        $dataToDisplay = $dataStream;
         $this->set([
             'sources' => $dataToDisplay,
             'errors' => $errorsOccured,

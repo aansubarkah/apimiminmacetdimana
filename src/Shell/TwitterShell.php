@@ -20,17 +20,18 @@ use Cake\Database\Type;//cakephp need this to save datetime field
  * Twitter Shell
  * @property \App\Model\Table\MarkersTable $Markers
  * @property \App\Model\Table\RespondentsTable $Respondents
+ * @property \App\Model\Table\SourcesTable $Sources
  */
 class TwitterShell extends Shell
 {
     public $settingsTwitter = [
-        'oauth_access_token' => '3555146480-sXfyGZDtrIDdzOMd1tt8srNWUijs7nCFfeag349',
-        'oauth_access_token_secret' => 'fKQN5cTbpDEvic613JtfHoVz7LC9dlSfUsP0yohuwboxY',
-        'consumer_key' => 'Bu8ZMGWX8LxqR0jjbCuKTvjfG',
-        'consumer_secret' => 'Fx43AKjpEksdAcG7y7SmDVH4Y2UfOVgQTzwmzSRInuPZaokGrX'
+        'oauth_access_token' => '3555146480-EVgv9OGkcVIgxUaIoM2shbgkKAQZaJNogBE5ovF',
+        'oauth_access_token_secret' => 'W78mlkW4mnNl92H7RO6eoDWtYwKU22F0sVxIyarvDqvxC',
+        'consumer_key' => 'exnjHqKAXhefmLcUL93M0wBqa',
+        'consumer_secret' => 'RLfNT2AeaTZZKs7RAGJCreK12rvSh98jTpGeM2l5maPYHgMQiF'
     ];
 
-    private $baseTwitterUrl = 'https://api.twitter.com/1.1/';
+    public $baseTwitterUrl = 'https://api.twitter.com/1.1/';
 
     public $Markers = null;
     public $Respondents = null;
@@ -43,12 +44,6 @@ class TwitterShell extends Shell
 
     public function main()
     {
-        //$this->out('Hello World!');
-        //$this->createFile('lorem.txt','halo dunia1');
-        //$dir = new Folder('app/tmp');
-        //$logFile = new File('../tmp/Twitter.txt', true, 0644);
-        //$logFile->write('lorem ipsum', 'w', false);
-        //$dataStream = $this->getMention($latestTwitID, 800);
         $this->Markers = TableRegistry::get('Markers');
 
         // first get the latest twitID from DB
@@ -61,7 +56,6 @@ class TwitterShell extends Shell
         if ($getLatestTwitID['twitID'] > 0) {
             $latestTwitID = $getLatestTwitID['twitID'];
         } else {
-            //$latestTwitID = 642008117992001536;//first test twit mentioning @macetsurabaya
             $latestTwitID = 1;
         }
 
@@ -76,8 +70,6 @@ class TwitterShell extends Shell
                 if ($data['place'] !== null) {
                     $isTwitExists = $this->Markers->exists(['twitID' => $data['id'], 'active' => 1]);
                     if (!$isTwitExists) {
-                        //$dataToDisplay[] = $data;
-                        //if geo located, insert to DB
                         //first get respondent_id
                         $respondent_id = $this->findToSaveRespondent($data['user']['id'], $data['user']['name'], $data['user']['screen_name']);
 
@@ -116,12 +108,13 @@ class TwitterShell extends Shell
                             $info = str_ireplace($twitURL, "", $info);
                             $info = trim($info);
                         }
+                        $dataToSave['info'] = $info;
 
                         // category_id and weather_id based on twit
                         $twitHashtagCategoryWeather = $this->findHashtagonText($info);
                         $dataToSave['category_id'] = $twitHashtagCategoryWeather[0];
                         $dataToSave['weather_id'] = $twitHashtagCategoryWeather[1];
-                        $dataToSave['info'] = $twitHashtagCategoryWeather[2];
+                        //$dataToSave['info'] = $twitHashtagCategoryWeather[2];
 
                         // if get precise location
                         if ($data['geo'] !== null) {
@@ -156,34 +149,34 @@ class TwitterShell extends Shell
         foreach ($matches[1] as $data) {
             $data = strtolower($data);
             switch ($data) {
-                case 'padat':
-                    $category_id = 2;
-                    break;
-                case 'lancar':
-                    $category_id = 3;
-                    break;
-                case 'mendung':
-                    $weather_id = 2;
-                    break;
-                case 'hujan deras':
-                    $weather_id = 3;
-                    break;
-                case 'hujanderas':
-                    $weather_id = 3;
-                    break;
-                case 'deras':
-                    $weather_id = 3;
-                    break;
-                case 'gerimis':
-                    $weather_id = 4;
-                    break;
-                case 'hujan':
-                    $weather_id = 5;
-                    break;
-                default:
-                    $category_id = 1;
-                    $weather_id = 1;
-                    break;
+            case 'padat':
+                $category_id = 2;
+                break;
+            case 'lancar':
+                $category_id = 3;
+                break;
+            case 'mendung':
+                $weather_id = 2;
+                break;
+            case 'hujan deras':
+                $weather_id = 3;
+                break;
+            case 'hujanderas':
+                $weather_id = 3;
+                break;
+            case 'deras':
+                $weather_id = 3;
+                break;
+            case 'gerimis':
+                $weather_id = 4;
+                break;
+            case 'hujan':
+                $weather_id = 5;
+                break;
+            default:
+                $category_id = 1;
+                $weather_id = 1;
+                break;
             }
 
             //clean text from hashtag
@@ -203,10 +196,6 @@ class TwitterShell extends Shell
         preg_match_all($regex, $text, $result, PREG_PATTERN_ORDER);
         $return = $result[0];
 
-        //foreach ($A as $B) {
-        //    $URL = $this->getRealURL($B);
-        //    $return = $URL;
-        //}
         return $return;
     }
 
@@ -255,6 +244,110 @@ class TwitterShell extends Shell
             $respondent_id = $respondent->id;
         }
         return $respondent_id;
+    }
+
+    /**
+     * Get Timeline Method
+     *
+     **/
+    private function getTimeline($latestTwitID = 0, $howManyTweets = 200) {
+        $Twitter = new TwitterAPIExchange($this->settingsTwitter);
+
+        $url = $this->baseTwitterUrl . 'statuses/home_timeline.json';
+        $getfield = '?count=' . $howManyTweets;
+        if ($latestTwitID > 0) {
+            $getfield = $getfield . '&since_id=' . $latestTwitID;
+        }
+        $requestMethod = 'GET';
+
+        $data = $Twitter->setGetfield($getfield)
+            ->buildOauth($url, $requestMethod)
+            ->performRequest();
+
+        return json_decode($data, true);
+    }
+
+    public function timeLine() {
+        $this->Sources = TableRegistry::get('Sources');
+        // first get the latest twitID from DB
+        $getLatestTwitID = $this->Sources->find()
+            ->select(['twitID'])
+            ->where(['active' => true])
+            ->order(['twitID' => 'DESC'])
+            ->first();
+
+        if ($getLatestTwitID['twitID'] > 0) {
+            $latestTwitID = $getLatestTwitID['twitID'];
+        } else {
+            $latestTwitID = 1;
+        }
+        $dataStream = $this->getTimeline($latestTwitID, 200);
+        $countDataStream = count($dataStream);
+
+        if ($countDataStream > 0) {
+            //$i = 1;
+            foreach ($dataStream as $datum) {
+                $respondent = $this->Sources->Respondents->find()
+                    ->select(['id'])
+                    ->where(['isOfficial' => 1, 'contact' => '@' . $datum['user']['screen_name']])
+                    ->first();
+                $respondent_id = $respondent['id'];
+
+                if (!empty($respondent_id)) {
+                    $info = $datum['text'];
+                    $created_at = date("Y-m-d H:i:s", strtotime($datum['created_at']));
+                    Type::build('datetime')->useLocaleParser();//cakephp need this to save datetime field
+                    $dataToSave = [
+                        'respondent_id' => $respondent_id,
+                        'lat' => 0,
+                        'lng' => 0,
+                        'twitID' => $datum['id'],
+                        'twitTime' => new Time($created_at),
+                        'info' => $datum['text'],
+                        'url' => null,
+                        'media' => null,
+                        'isImported' => 0,
+                        'active' => 1
+                    ];
+                    // if image do exists
+                    if (array_key_exists('extended_entities', $datum) &&
+                        array_key_exists('media', $datum['extended_entities']) &&
+                        $datum['extended_entities']['media'][0]['type'] == 'photo'
+                    ) {
+                        $dataToSave['media'] = $datum['extended_entities']['media'][0]['media_url_https'];
+                    }
+                    // if url do exists
+                    $twitURL = $this->findURLonText($info);
+                    if ($twitURL !== null) {
+                        $dataToSave['url'] = $twitURL;
+                        $info = str_ireplace($twitURL, "", $info);
+                        $info = trim($info);
+                    }
+                    $dataToSave['info'] = $info;
+
+                    // if get precise location
+                    if ($datum['geo'] !== null) {
+                        $dataToSave['lat'] = $datum['geo']['coordinates'][0];
+                        $dataToSave['lng'] = $datum['geo']['coordinates'][1];
+                    }
+
+                    // save twit to db
+                    $source = $this->Sources->newEntity($dataToSave);
+                    if ($this->Sources->save($source)) {
+                        //$this->out($i . '. ' . $info);
+                        //$i++;
+                    } else {
+                        //$errorsOccured[] = $this->Sources->validationErrors;
+                    }
+                }
+            }
+        }
+        /*$dataToDisplay = $dataStream;
+        $this->set([
+            'sources' => $dataToDisplay,
+            'errors' => $errorsOccured,
+            '_serialize' => ['sources', 'errors']
+        ]);*/
     }
 }
 //cronjob
