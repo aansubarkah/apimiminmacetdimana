@@ -65,7 +65,16 @@ class AppController extends Controller
     {
         parent::beforeFilter($event);
         //$this->Auth->allow(['view', 'index', 'checkExistence', 'edit',
-            //'delete', 'add', 'twit', 'twit1', 'mention','token', 'getMention', 'mentionToDB']);
+        //'delete', 'add', 'twit', 'twit1', 'mention','token', 'getMention', 'mentionToDB']);
         $this->Auth->allow(['token', 'getMention']);
     }
+
+    public $settingsTwitter = [
+        'oauth_access_token' => '3555146480-EVgv9OGkcVIgxUaIoM2shbgkKAQZaJNogBE5ovF',
+        'oauth_access_token_secret' => 'W78mlkW4mnNl92H7RO6eoDWtYwKU22F0sVxIyarvDqvxC',
+        'consumer_key' => 'exnjHqKAXhefmLcUL93M0wBqa',
+        'consumer_secret' => 'RLfNT2AeaTZZKs7RAGJCreK12rvSh98jTpGeM2l5maPYHgMQiF'
+    ];
+
+    public $baseTwitterUrl = 'https://api.twitter.com/1.1/';
 }
