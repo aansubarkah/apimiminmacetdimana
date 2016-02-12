@@ -336,8 +336,9 @@ class TwitterShell extends Shell
                     if ($this->Sources->save($source)) {
                         //$this->out($i . '. ' . $info);
                         //$i++;
+                        $this->out(date('Y-m-d H:i:s') . ' succeed');
                     } else {
-                        //$errorsOccured[] = $this->Sources->validationErrors;
+                        $this->out(date('Y-m-d H:i:s') . ' error occured');
                     }
                 }
             }

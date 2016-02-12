@@ -22,14 +22,14 @@ class TwitsController extends AppController
         $this->Auth->allow(['mentionToDB']);
     }
 
-    public $settingsTwitter = [
+    /*public $settingsTwitter = [
         'oauth_access_token' => '3555146480-EVgv9OGkcVIgxUaIoM2shbgkKAQZaJNogBE5ovF',
         'oauth_access_token_secret' => 'W78mlkW4mnNl92H7RO6eoDWtYwKU22F0sVxIyarvDqvxC',
         'consumer_key' => 'exnjHqKAXhefmLcUL93M0wBqa',
         'consumer_secret' => 'RLfNT2AeaTZZKs7RAGJCreK12rvSh98jTpGeM2l5maPYHgMQiF'
     ];
 
-    private $baseTwitterUrl = 'https://api.twitter.com/1.1/';
+    private $baseTwitterUrl = 'https://api.twitter.com/1.1/';*/
 
     //private $Markers = TableRegistry::get('Markers');
     private $Markers = null;

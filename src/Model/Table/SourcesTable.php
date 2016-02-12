@@ -11,6 +11,7 @@ use Cake\Validation\Validator;
  * Sources Model
  *
  * @property \Cake\ORM\Association\BelongsTo $Respondents
+ * @property \Cake\ORM\Association\BelongsTo $Regions
  */
 class SourcesTable extends Table
 {
@@ -33,6 +34,11 @@ class SourcesTable extends Table
             'foreignKey' => 'respondent_id',
             'joinType' => 'INNER'
         ]);
+
+        $this->belongsTo('Regions', [
+            'foreignKey' => 'region_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**
@@ -45,6 +51,20 @@ class SourcesTable extends Table
     {
         $validator
             ->allowEmpty('id', 'create');
+
+        $validator
+            ->requirePresence('regionName', 'create')
+            ->notEmpty('regionName');
+
+        $validator
+            ->add('regionLat', 'valid', ['rule' => 'numeric'])
+            ->requirePresence('regionLat', 'create')
+            ->notEmpty('regionLat');
+
+        $validator
+            ->add('regionLng', 'valid', ['rule' => 'numeric'])
+            ->requirePresence('regionLng', 'create')
+            ->notEmpty('regionLng');
 
         $validator
             ->add('lat', 'valid', ['rule' => 'numeric'])
@@ -66,16 +86,22 @@ class SourcesTable extends Table
             ->notEmpty('twitTime');
 
         $validator
+            ->requirePresence('twitUserID', 'create')
+            ->notEmpty('twitUserID');
+
+        $validator
+            ->requirePresence('twitUserScreenName', 'create')
+            ->notEmpty('twitUserScreenName');
+
+        $validator
             ->requirePresence('info', 'create')
             ->notEmpty('info');
 
-        /*$validator
-            ->requirePresence('url', 'create')
-            ->notEmpty('url');
+        $validator
+            ->allowEmpty('url', 'create');
 
         $validator
-            ->requirePresence('media', 'create')
-            ->notEmpty('media');*/
+            ->allowEmpty('media', 'create');
 
         $validator
             ->add('isImported', 'valid', ['rule' => 'boolean'])

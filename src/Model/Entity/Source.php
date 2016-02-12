@@ -9,10 +9,17 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property int $respondent_id
  * @property \App\Model\Entity\Respondent $respondent
+ * @property int $region_id
+ * @property \App\Model\Entity\Region $region
+ * @property string $regionName
+ * @property float $regionLat
+ * @property float $regionLng
  * @property float $lat
  * @property float $lng
  * @property int $twitID
  * @property \Cake\I18n\Time $twitTime
+ * @property int $twitUserID
+ * @property string $twitUserScreenName
  * @property string $info
  * @property string $url
  * @property string $media
