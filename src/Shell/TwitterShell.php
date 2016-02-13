@@ -226,7 +226,7 @@ class TwitterShell extends Shell
         if ($isRespondentExists) {
             $respondent_id = $this->Respondents->find()
                 ->select(['id'])
-                ->where(['twitUserID' => $twitterUserID, 'active' => 1])
+                ->where(['twitUserID' => $twitterUserID])
                 ->order(['id' => 'DESc'])
                 ->first();
             //otherwise insert into table
