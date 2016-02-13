@@ -267,6 +267,19 @@ class TwitterShell extends Shell
         return json_decode($data, true);
     }
 
+    public function test(){
+        $this->Sources = TableRegistry::get('Sources');
+
+        $respondent = $this->Sources->Respondents->find()
+                    ->contain(['Regions'])
+                    ->select(['Respondents.id', 'Respondents.region_id', 'Regions.lat', 'Regions.lng', 'Regions.name'])
+                    ->where(['isOfficial' => 1, 'contact' => '@e100ss'])
+                    ->first();
+        $this->out($respondent['id']);
+        $this->out($respondent['region_id']);
+        $this->out($respondent['region']['lat']);
+    }
+
     public function timeLine() {
         $this->Sources = TableRegistry::get('Sources');
         // first get the latest twitID from DB
@@ -288,7 +301,8 @@ class TwitterShell extends Shell
             //$i = 1;
             foreach ($dataStream as $datum) {
                 $respondent = $this->Sources->Respondents->find()
-                    ->select(['id', 'region_id'])
+                    ->contain(['Regions'])
+                    ->select(['Respondents.id', 'Respondents.region_id', 'Regions.lat', 'Regions.lng', 'Regions.name'])
                     ->where(['isOfficial' => 1, 'contact' => '@' . $datum['user']['screen_name']])
                     ->first();
                 $respondent_id = $respondent['id'];
@@ -299,10 +313,16 @@ class TwitterShell extends Shell
                     Type::build('datetime')->useLocaleParser();//cakephp need this to save datetime field
                     $dataToSave = [
                         'respondent_id' => $respondent_id,
+                        'region_id' => $respondent['region_id'],
+                        'regionName' => $respondent['region']['name'],
+                        'regionLat' => $respondent['region']['lat'],
+                        'regionLng' => $respondent['region']['lng'],
                         'lat' => 0,
                         'lng' => 0,
                         'twitID' => $datum['id'],
                         'twitTime' => new Time($created_at),
+                        'twitUserID' => $datum['user']['id'],
+                        'twitUserScreenName' => $datum['user']['screen_name'],
                         'info' => $datum['text'],
                         'url' => null,
                         'media' => null,
