@@ -150,8 +150,7 @@ class RespondentsController extends AppController
         if (!empty($screenName)) {
             $Twitter = new TwitterAPIExchange($this->settingsTwitter);
             $url = $this->baseTwitterUrl . 'friendships/create.json';
-            //$postfield = '?screen_name=' . $screenName;
-            //$postfield = $postfield . '&follow=true';
+
             $postfield = [
                 'screen_name' => $screenName,
                 'follow' => true

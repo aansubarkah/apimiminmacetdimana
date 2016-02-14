@@ -3,6 +3,7 @@ namespace App\Shell;
 
 use Cake\Console\Shell;
 //use Cake\Mailer\Email;
+use Cake\ORM\TableRegistry;
 use Cake\Network\Email\Email;
 
 /**
@@ -10,10 +11,12 @@ use Cake\Network\Email\Email;
  */
 class ReportShell extends Shell
 {
+    public $Users = null;
+
     public function initialize()
     {
         parent::initialize();
-        $this->loadModel('Markers');
+        $this->loadModel('Users');
     }
 
     /**
@@ -24,6 +27,41 @@ class ReportShell extends Shell
     public function main()
     {
         $this->out('Hello World This is Report');
+    }
+
+    public function activitiesToday() {
+        $this->Users = TableRegistry::get('Users');
+
+        $inputers = $this->Users->find();
+        $inputers->where(['active' => 1]);
+
+        foreach($inputers as $inputer) {
+            $isTodayActivityInserted = $this->Users->Activities->find()
+                ->where([
+                    'user_id' => $inputer['id'],
+                    'DATE(created)' => date('Y-m-d'),
+                    'active' => 1
+                ])
+                ->count();
+
+            if($isTodayActivityInserted < 1) {
+                $todayActivity = $this->Users->Markers->find()
+                    ->where([
+                        'user_id' => $inputer['id'],
+                        'DATE(created)' => date('Y-m-d'),
+                        'active' => 1
+                    ])
+                    ->count();
+
+                $dataToSave = [
+                    'user_id' => $inputer['id'],
+                    'value' => $todayActivity,
+                    'active' => 1
+                ];
+                $activity = $this->Users->Activities->newEntity($dataToSave);
+                $this->Users->Activities->save($activity);
+            }
+        }
     }
 
     public function emailToManager() {

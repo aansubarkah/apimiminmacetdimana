@@ -236,6 +236,7 @@ class TwitterShell extends Shell
                 'twitUserID' => $twitterUserID,
                 'name' => $twitterName,
                 'contact' => '@' . $twitterScreenName,
+                'isOfficial' => 0,
                 'active' => 1
             ];
             $respondent = $this->Respondents->newEntity($dataToSave);

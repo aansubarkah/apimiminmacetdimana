@@ -27,61 +27,88 @@ class ActivitiesController extends AppController
      *
      * @return void
      */
-    public function index()
+    public function index($managerID = null)
     {
-        $id = $this->Auth->user('id');
+        $data = [];
 
-        $userTotal = $this->Users->Markers->find()
-            ->where([
-                'AND' => [
-                    ['Markers.user_id' => $id],
-                    ['Markers.active' => 1]
-                ]
-            ])
-            ->count();
+        if($managerID === null) {
+            $data = $this->managerAcivitiesAWeek();
+        }
 
-        $userTotalWeek = $this->Users->Markers->find()
-            ->where([
-                'AND' => [
-                    ['Markers.user_id' => $id],
-                    ['Markers.active' => 1],
-                    ['DATE(Markers.created) >' => date('Y-m-d', strtotime('-7 days'))]
-                ]
-            ])
-            ->count();
+        $this->set([
+            'activities' => $data,
+            '_serialize' => ['activities']
+        ]);
+    }
 
+    private function managerAcivitiesAWeek()
+    {
+        // get all manager (inputer) ids
+        $managers = $this->Users->find();
+        $managers->where(['group_id' => 2, 'active' => 1]);
+        $allManagers = [];
+        $dataID = 0;
 
-        // user count 7 days
-        $weekly = [];
-        for($i = 0; $i < 7; $i++) {
-            $days = '-' . (6-$i) . ' days';
-            $date = date('Y-m-d', strtotime($days));
-            $userRowsCount = $this->Users->Markers->find()
+        foreach ($managers as $manager) {
+            $id = $manager['id'];
+
+            $userTotal = $this->Users->Markers->find()
                 ->where([
                     'AND' => [
                         ['Markers.user_id' => $id],
-                        ['Date(Markers.created)' => $date],
                         ['Markers.active' => 1]
                     ]
                 ])
                 ->count();
-            $weekly[] = [
-                'id' => $i+1,
-                'name' => $date,
-                'value' => $userRowsCount
+
+            $userTotalWeek = $this->Users->Markers->find()
+                ->where([
+                    'AND' => [
+                        ['Markers.user_id' => $id],
+                        ['Markers.active' => 1],
+                        ['DATE(Markers.created) >' => date('Y-m-d', strtotime('-7 days'))]
+                    ]
+                ])
+                ->count();
+
+            // user count 7 days
+            $weekly = [];
+            for($i = 0; $i < 7; $i++) {
+                $days = '-' . (6-$i) . ' days';
+                $date = date('Y-m-d', strtotime($days));
+                $userRowsCount = $this->Users->Markers->find()
+                    ->where([
+                        'AND' => [
+                            ['Markers.user_id' => $id],
+                            ['Date(Markers.created)' => $date],
+                            ['Markers.active' => 1]
+                        ]
+                    ])
+                    ->count();
+                $weekly[] = [
+                    'val' => $userRowsCount
+                ];
+                //$weekly[] = $userRowsCount;
+                /*$weekly[] = [
+                    'id' => $i+1,
+                    'name' => $date,
+                    'value' => $userRowsCount
+                ];*/
+            }
+
+            $dataID++;
+            $allManagers[] = [
+                'id' => $dataID,
+                'name' => $manager['username'],
+                'value' => [
+                    'total' => $userTotal,
+                    'totalWeek' => $userTotalWeek,
+                    'weekly' => $weekly
+                ]
             ];
         }
 
-        $meta = [
-            'total' => $userTotal,
-            'totalWeek' => $userTotalWeek
-        ];
-
-        $this->set([
-            'activities' => $weekly,
-            'meta' => $meta,
-            '_serialize' => ['activities', 'meta']
-        ]);
+        return $allManagers;
     }
 
     /**
@@ -146,70 +173,70 @@ class ActivitiesController extends AppController
             'meta' => $meta,
             '_serialize' => ['activities', 'meta']
         ]);
-    }
+        }
 
-    /**
-     * Add method
-     *
-     * @return void Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $activity = $this->Activities->newEntity();
-        if ($this->request->is('post')) {
-            $activity = $this->Activities->patchEntity($activity, $this->request->data);
-            if ($this->Activities->save($activity)) {
-                $this->Flash->success(__('The activity has been saved.'));
-                return $this->redirect(['action' => 'index']);
-            } else {
-                $this->Flash->error(__('The activity could not be saved. Please, try again.'));
-            }
+        /**
+         * Add method
+         *
+         * @return void Redirects on successful add, renders view otherwise.
+         */
+        public function add()
+        {
+            $activity = $this->Activities->newEntity();
+            if ($this->request->is('post')) {
+                $activity = $this->Activities->patchEntity($activity, $this->request->data);
+                if ($this->Activities->save($activity)) {
+                    $this->Flash->success(__('The activity has been saved.'));
+                    return $this->redirect(['action' => 'index']);
+        } else {
+            $this->Flash->error(__('The activity could not be saved. Please, try again.'));
+        }
         }
         $this->set(compact('activity'));
         $this->set('_serialize', ['activity']);
-    }
+        }
 
-    /**
-     * Edit method
-     *
-     * @param string|null $id Activity id.
-     * @return void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Network\Exception\NotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $activity = $this->Activities->get($id, [
-            'contain' => []
-        ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $activity = $this->Activities->patchEntity($activity, $this->request->data);
-            if ($this->Activities->save($activity)) {
-                $this->Flash->success(__('The activity has been saved.'));
-                return $this->redirect(['action' => 'index']);
-            } else {
-                $this->Flash->error(__('The activity could not be saved. Please, try again.'));
-            }
+        /**
+         * Edit method
+         *
+         * @param string|null $id Activity id.
+         * @return void Redirects on successful edit, renders view otherwise.
+         * @throws \Cake\Network\Exception\NotFoundException When record not found.
+         */
+        public function edit($id = null)
+        {
+            $activity = $this->Activities->get($id, [
+                'contain' => []
+            ]);
+            if ($this->request->is(['patch', 'post', 'put'])) {
+                $activity = $this->Activities->patchEntity($activity, $this->request->data);
+                if ($this->Activities->save($activity)) {
+                    $this->Flash->success(__('The activity has been saved.'));
+                    return $this->redirect(['action' => 'index']);
+        } else {
+            $this->Flash->error(__('The activity could not be saved. Please, try again.'));
+        }
         }
         $this->set(compact('activity'));
         $this->set('_serialize', ['activity']);
-    }
+        }
 
-    /**
-     * Delete method
-     *
-     * @param string|null $id Activity id.
-     * @return void Redirects to index.
-     * @throws \Cake\Network\Exception\NotFoundException When record not found.
-     */
-    public function delete($id = null)
-    {
-        $this->request->allowMethod(['post', 'delete']);
-        $activity = $this->Activities->get($id);
-        if ($this->Activities->delete($activity)) {
-            $this->Flash->success(__('The activity has been deleted.'));
+        /**
+         * Delete method
+         *
+         * @param string|null $id Activity id.
+         * @return void Redirects to index.
+         * @throws \Cake\Network\Exception\NotFoundException When record not found.
+         */
+        public function delete($id = null)
+        {
+            $this->request->allowMethod(['post', 'delete']);
+            $activity = $this->Activities->get($id);
+            if ($this->Activities->delete($activity)) {
+                $this->Flash->success(__('The activity has been deleted.'));
         } else {
             $this->Flash->error(__('The activity could not be deleted. Please, try again.'));
         }
         return $this->redirect(['action' => 'index']);
-    }
-}
+        }
+        }
