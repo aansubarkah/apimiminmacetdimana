@@ -67,6 +67,9 @@ class SourcesTable extends Table
             ->notEmpty('regionLng');
 
         $validator
+            ->allowEmpty('placeName', 'create');
+
+        $validator
             ->add('lat', 'valid', ['rule' => 'numeric'])
             ->requirePresence('lat', 'create')
             ->notEmpty('lat');

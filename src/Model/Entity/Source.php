@@ -14,6 +14,7 @@ use Cake\ORM\Entity;
  * @property string $regionName
  * @property float $regionLat
  * @property float $regionLng
+ * @property string $placeName
  * @property float $lat
  * @property float $lng
  * @property int $twitID
