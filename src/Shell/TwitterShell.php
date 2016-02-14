@@ -317,6 +317,7 @@ class TwitterShell extends Shell
                         'regionName' => $respondent['region']['name'],
                         'regionLat' => $respondent['region']['lat'],
                         'regionLng' => $respondent['region']['lng'],
+                        'placeName' => null,
                         'lat' => 0,
                         'lng' => 0,
                         'twitID' => $datum['id'],

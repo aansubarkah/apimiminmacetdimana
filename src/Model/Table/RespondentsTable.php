@@ -66,6 +66,11 @@ class RespondentsTable extends Table
             ->notEmpty('contact');
 
         $validator
+            ->add('isOfficial', 'valid', ['rule' => 'boolean'])
+            ->requirePresence('isOfficial', 'create')
+            ->notEmpty('isOfficial');
+
+        $validator
             ->add('active', 'valid', ['rule' => 'boolean'])
             ->requirePresence('active', 'create')
             ->notEmpty('active');

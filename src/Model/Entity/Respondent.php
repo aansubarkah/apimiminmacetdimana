@@ -10,6 +10,7 @@ use Cake\ORM\Entity;
  * @property int $twitUserID
  * @property string $name
  * @property string $contact
+ * @property bool $isOfficial
  * @property bool $active
  * @property \App\Model\Entity\Marker[] $markers
  * @property \App\Model\Entity\Markerview[] $markerviews
