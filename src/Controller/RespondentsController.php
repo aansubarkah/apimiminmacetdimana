@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use TwitterAPIExchange;
 
 /**
  * Respondents Controller
@@ -121,16 +122,51 @@ class RespondentsController extends AppController
         if ($this->request->is('post')) {
             if (isset($this->request->data['respondent']['active'])) unset($this->request->data['respondent']['active']);
             if (isset($this->request->data['respondent']['id'])) unset($this->request->data['respondent']['id']);
+            $this->request->data['respondent']['isOfficial'] = true;
             $this->request->data['respondent']['active'] = true;
+
+            // if respondent is twitter user
+            $meta = 1;
+            if (strpos($this->request->data['respondent']['contact'], '@') !== false) {
+                $meta = $this->addFollowing($this->request->data['respondent']['contact']);
+            }
 
             $respondent = $this->Respondents->newEntity($this->request->data['respondent']);
             $this->Respondents->save($respondent);
 
             $this->set([
+                'meta' => $meta,
                 'respondent' => $respondent,
-                '_serialize' => ['respondent']
+                '_serialize' => ['meta', 'respondent']
             ]);
         }
+    }
+
+    private function addFollowing($screenName = null)
+    {
+        $message = 'error';
+        $screenName = str_replace('@', '', $screenName);
+        $screenName = trim($screenName);
+        if (!empty($screenName)) {
+            $Twitter = new TwitterAPIExchange($this->settingsTwitter);
+            $url = $this->baseTwitterUrl . 'friendships/create.json';
+            //$postfield = '?screen_name=' . $screenName;
+            //$postfield = $postfield . '&follow=true';
+            $postfield = [
+                'screen_name' => $screenName,
+                'follow' => true
+            ];
+
+            $requestMethod = 'POST';
+
+            $exec = $Twitter->setPostfields($postfield)
+                ->buildOauth($url, $requestMethod)
+                ->performRequest();
+
+            $message = 1;
+        }
+
+        return $message;
     }
 
     /**
