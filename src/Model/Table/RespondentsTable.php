@@ -12,6 +12,7 @@ use Cake\Validation\Validator;
  *
  * @property \Cake\ORM\Association\HasMany $Markers
  * @property \Cake\ORM\Association\HasMany $Markerviews
+ * @property \Cake\ORM\Association\HasMany $Sources
  * @property \Cake\ORM\Association\BelongsTo $Regions
  */
 class RespondentsTable extends Table
@@ -39,6 +40,9 @@ class RespondentsTable extends Table
             'foreignKey' => 'respondent_id'
         ]);
         $this->hasMany('Markerviews', [
+            'foreignKey' => 'respondent_id'
+        ]);
+        $this->hasMany('Sources', [
             'foreignKey' => 'respondent_id'
         ]);
     }
