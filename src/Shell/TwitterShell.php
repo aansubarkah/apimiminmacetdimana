@@ -111,10 +111,11 @@ class TwitterShell extends Shell
                         $dataToSave['info'] = $info;
 
                         // category_id and weather_id based on twit
-                        $twitHashtagCategoryWeather = $this->findHashtagonText($info);
+                        //$twitHashtagCategoryWeather = $this->findHashtagonText($info);
+                        $twitHashtagCategoryWeather = $this->findHashtagonText($info, $data['entities']['hashtags']);
                         $dataToSave['category_id'] = $twitHashtagCategoryWeather[0];
                         $dataToSave['weather_id'] = $twitHashtagCategoryWeather[1];
-                        //$dataToSave['info'] = $twitHashtagCategoryWeather[2];
+                        $dataToSave['info'] = $twitHashtagCategoryWeather[2];
 
                         // if get precise location
                         if ($data['geo'] !== null) {
@@ -139,15 +140,17 @@ class TwitterShell extends Shell
 
     // to find category_id and weather_id
     // @todo #Lapor #Tanya
-    private function findHashtagonText($text)
+    private function findHashtagonText($text, $hashtags)
     {
         $newText = $text;
+        /*$newText = $text;
         $category_id = 1;//macet
         $weather_id = 1;//cerah
-        preg_match_all('/#([^\s]+)/', $text, $matches);
+        preg_match_all('/#([^\s]+)/', $text, $matches);*/
 
-        foreach ($matches[1] as $data) {
-            $data = strtolower($data);
+        //foreach ($matches[1] as $data) {
+        foreach ($hashtags as $data) {
+            $data = strtolower($data['text']);
             switch ($data) {
             case 'padat':
                 $category_id = 2;
@@ -157,6 +160,9 @@ class TwitterShell extends Shell
                 break;
             case 'mendung':
                 $weather_id = 2;
+                break;
+            case 'hujan':
+                $weather_id = 3;
                 break;
             case 'hujan deras':
                 $weather_id = 3;

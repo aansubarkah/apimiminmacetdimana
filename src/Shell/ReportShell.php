@@ -34,6 +34,7 @@ class ReportShell extends Shell
 
         $inputers = $this->Users->find();
         $inputers->where(['active' => 1]);
+        $yesterday = date('Y-m-d', strtotime('-1 days'));
 
         foreach($inputers as $inputer) {
             $isTodayActivityInserted = $this->Users->Activities->find()
@@ -48,7 +49,7 @@ class ReportShell extends Shell
                 $todayActivity = $this->Users->Markers->find()
                     ->where([
                         'user_id' => $inputer['id'],
-                        'DATE(created)' => date('Y-m-d'),
+                        'DATE(created)' => $yesterday,
                         'active' => 1
                     ])
                     ->count();
