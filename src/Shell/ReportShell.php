@@ -40,7 +40,7 @@ class ReportShell extends Shell
             $isTodayActivityInserted = $this->Users->Activities->find()
                 ->where([
                     'user_id' => $inputer['id'],
-                    'DATE(created)' => date('Y-m-d'),
+                    'DATE(occured)' => $yesterday,
                     'active' => 1
                 ])
                 ->count();
@@ -56,6 +56,7 @@ class ReportShell extends Shell
 
                 $dataToSave = [
                     'user_id' => $inputer['id'],
+                    'occured' => $yesterday,
                     'value' => $todayActivity,
                     'active' => 1
                 ];
@@ -73,5 +74,52 @@ class ReportShell extends Shell
             ->subject('Daily Activity')
             ->send('Lorem Ipsum DOlor sit Amet');
         $this->out('Success');
+    }
+
+    public function test() {
+        $dataToSave = [
+            'user_id' => 1,
+            'occured' => date('Y-m-d', strtotime('-1 days')),
+            'value' => 1,
+            'active' => 0
+        ];
+
+        $activity = $this->Users->Activities->newEntity($dataToSave);
+        $this->Users->Activities->save($activity);
+    }
+
+    public function add() {
+        // get all manager (inputer) ids
+        $managers = $this->Users->find();
+        $allManagers = [];
+        $dataID = 0;
+
+        foreach ($managers as $manager) {
+            $id = $manager['id'];
+
+            for($i = 1; $i < 25; $i++) {
+                $days = '-' . ($i) . ' days';
+                $date = date('Y-m-d', strtotime($days));
+                $userRowsCount = $this->Users->Markers->find()
+                    ->where([
+                        'AND' => [
+                            ['Markers.user_id' => $id],
+                            ['Date(Markers.created)' => $date],
+                            ['Markers.active' => 1]
+                        ]
+                    ])
+                    ->count();
+
+                $dataToSave = [
+                    'user_id' => $id,
+                    'occured' => $date,
+                    'value' => $userRowsCount,
+                    'active' => 1
+                ];
+
+                $activity = $this->Users->Activities->newEntity($dataToSave);
+                $this->Users->Activities->save($activity);
+            }
+        }
     }
 }
