@@ -98,7 +98,7 @@ class TwitterShell extends Shell
                             array_key_exists('media', $data['extended_entities']) &&
                             $data['extended_entities']['media'][0]['type'] == 'photo'
                         ) {
-                            $dataToSave['twitImage'] = $data['extended_entities']['media'][0]['media_url'];
+                            $dataToSave['twitImage'] = $data['extended_entities']['media'][0]['media_url_https'];
                         }
 
                         // if url do exists

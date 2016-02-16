@@ -54,6 +54,9 @@ class ActivitiesTable extends Table
             ->notEmpty('value');
 
         $validator
+            ->allowEmpty('occured', 'create');
+
+        $validator
             ->add('active', 'valid', ['rule' => 'boolean'])
             ->requirePresence('active', 'create')
             ->notEmpty('active');
