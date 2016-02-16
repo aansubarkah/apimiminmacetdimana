@@ -88,7 +88,7 @@ class ReportShell extends Shell
         $this->Users->Activities->save($activity);
     }
 
-    public function add() {
+    /*public function add() {
         // get all manager (inputer) ids
         $managers = $this->Users->find();
         $allManagers = [];
@@ -121,5 +121,5 @@ class ReportShell extends Shell
                 $this->Users->Activities->save($activity);
             }
         }
-    }
+    }*/
 }

@@ -132,6 +132,9 @@ class TwitterShell extends Shell
                         //save marker
                         $marker = $this->Markers->newEntity($dataToSave);
                         $this->Markers->save($marker);
+
+                        // do retweet
+                        $this->retweet($data['id']);
                     }
                 }
             }
@@ -143,10 +146,10 @@ class TwitterShell extends Shell
     private function findHashtagonText($text, $hashtags)
     {
         $newText = $text;
-        /*$newText = $text;
+        //$newText = $text;
         $category_id = 1;//macet
         $weather_id = 1;//cerah
-        preg_match_all('/#([^\s]+)/', $text, $matches);*/
+        //preg_match_all('/#([^\s]+)/', $text, $matches);*/
 
         //foreach ($matches[1] as $data) {
         foreach ($hashtags as $data) {
@@ -254,6 +257,25 @@ class TwitterShell extends Shell
     }
 
     /**
+     * Retweet Method
+     *
+     * @return void
+     */
+    private function retweet($twitID = null) {
+        if (!empty($twitID)) {
+            $Twitter = new TwitterAPIExchange($this->settingsTwitter);
+            $url = $this->baseTwitterUrl . 'statuses/retweet/';
+            $url = $url . $twitID . '.json';
+            $requestMethod = 'POST';
+            $postfield = [];
+
+            $exec = $Twitter->setPostfields($postfield)
+                ->buildOauth($url, $requestMethod)
+                ->performRequest();
+        }
+    }
+
+    /**
      * Get Timeline Method
      *
      **/
@@ -278,10 +300,10 @@ class TwitterShell extends Shell
         $this->Sources = TableRegistry::get('Sources');
 
         $respondent = $this->Sources->Respondents->find()
-                    ->contain(['Regions'])
-                    ->select(['Respondents.id', 'Respondents.region_id', 'Regions.lat', 'Regions.lng', 'Regions.name'])
-                    ->where(['isOfficial' => 1, 'contact' => '@e100ss'])
-                    ->first();
+            ->contain(['Regions'])
+            ->select(['Respondents.id', 'Respondents.region_id', 'Regions.lat', 'Regions.lng', 'Regions.name'])
+            ->where(['isOfficial' => 1, 'contact' => '@e100ss'])
+            ->first();
         $this->out($respondent['id']);
         $this->out($respondent['region_id']);
         $this->out($respondent['region']['lat']);
@@ -305,7 +327,6 @@ class TwitterShell extends Shell
         $countDataStream = count($dataStream);
 
         if ($countDataStream > 0) {
-            //$i = 1;
             foreach ($dataStream as $datum) {
                 $respondent = $this->Sources->Respondents->find()
                     ->contain(['Regions'])
@@ -362,8 +383,6 @@ class TwitterShell extends Shell
                     // save twit to db
                     $source = $this->Sources->newEntity($dataToSave);
                     if ($this->Sources->save($source)) {
-                        //$this->out($i . '. ' . $info);
-                        //$i++;
                         $this->out(date('Y-m-d H:i:s') . ' succeed');
                     } else {
                         $this->out(date('Y-m-d H:i:s') . ' error occured');
@@ -371,14 +390,5 @@ class TwitterShell extends Shell
                 }
             }
         }
-        /*$dataToDisplay = $dataStream;
-        $this->set([
-            'sources' => $dataToDisplay,
-            'errors' => $errorsOccured,
-            '_serialize' => ['sources', 'errors']
-        ]);*/
     }
 }
-//cronjob
-//php -c /home/dmmctcom/public_html/php.ini cd /home/dmmctcom/public_html/apimimin && bin/cake twitter > /home/dmmctcom/public_html/apimimin/tmp/logs/cron_logs.txt 2>&1
-//wget http://apimimin.dimanamacet.com/twits/mentionToDB > /home/dmmctcom/public_html/apimimin/tmp/logs/cron_logs.txt 2>&1
