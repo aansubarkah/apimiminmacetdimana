@@ -12,6 +12,7 @@ use Cake\Validation\Validator;
  *
  * @property \Cake\ORM\Association\HasMany $Markers
  * @property \Cake\ORM\Association\HasMany $Markerviews
+ * @property \Cake\ORM\Association\HasMany $Sources
  */
 class CategoriesTable extends Table
 {
@@ -34,6 +35,9 @@ class CategoriesTable extends Table
             'foreignKey' => 'category_id'
         ]);
         $this->hasMany('Markerviews', [
+            'foreignKey' => 'category_id'
+        ]);
+        $this->hasMany('Sources', [
             'foreignKey' => 'category_id'
         ]);
     }

@@ -15,6 +15,12 @@ use Cake\ORM\Entity;
  * @property float $regionLat
  * @property float $regionLng
  * @property string $placeName
+ * @property int $category_id
+ * @property \App\Model\Entity\Category $category
+ * @property string $categoryName
+ * @property int $weather_id
+ * @property \App\Model\Entity\Weather $weather
+ * @property string $weatherName
  * @property float $lat
  * @property float $lng
  * @property int $twitID

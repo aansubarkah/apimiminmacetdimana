@@ -12,6 +12,7 @@ use Cake\Validation\Validator;
  *
  * @property \Cake\ORM\Association\HasMany $Markers
  * @property \Cake\ORM\Association\HasMany $Markerviews
+ * @property \Cake\ORM\Association\HasMany $Sources
  */
 class WeatherTable extends Table
 {
@@ -34,6 +35,9 @@ class WeatherTable extends Table
             'foreignKey' => 'weather_id'
         ]);
         $this->hasMany('Markerviews', [
+            'foreignKey' => 'weather_id'
+        ]);
+        $this->hasMany('Sources', [
             'foreignKey' => 'weather_id'
         ]);
     }

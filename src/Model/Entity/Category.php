@@ -11,6 +11,7 @@ use Cake\ORM\Entity;
  * @property bool $active
  * @property \App\Model\Entity\Marker[] $markers
  * @property \App\Model\Entity\Markerview[] $markerviews
+ * @property \App\Model\Entity\Source[] $sources
  */
 class Category extends Entity
 {

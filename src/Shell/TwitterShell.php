@@ -330,67 +330,69 @@ class TwitterShell extends Shell
 
         if ($countDataStream > 0) {
             foreach ($dataStream as $datum) {
-                $respondent = $this->Sources->Respondents->find()
-                    ->contain(['Regions'])
-                    ->select(['Respondents.id', 'Respondents.region_id', 'Regions.lat', 'Regions.lng', 'Regions.name'])
-                    ->where(['isOfficial' => 1, 'contact' => '@' . $datum['user']['screen_name']])
-                    ->first();
-                $respondent_id = $respondent['id'];
+                if ($datum['user']['id'] !== 3555146480) {// dimanamacetid twitter user
+                    $respondent = $this->Sources->Respondents->find()
+                        ->contain(['Regions'])
+                        ->select(['Respondents.id', 'Respondents.region_id', 'Regions.lat', 'Regions.lng', 'Regions.name'])
+                        ->where(['isOfficial' => 1, 'contact' => '@' . $datum['user']['screen_name']])
+                        ->first();
+                    $respondent_id = $respondent['id'];
 
-                if (!empty($respondent_id)) {
-                    $info = $datum['text'];
-                    $created_at = date("Y-m-d H:i:s", strtotime($datum['created_at']));
-                    Type::build('datetime')->useLocaleParser();//cakephp need this to save datetime field
-                    $dataToSave = [
-                        'respondent_id' => $respondent_id,
-                        'region_id' => $respondent['region_id'],
-                        'regionName' => $respondent['region']['name'],
-                        'regionLat' => $respondent['region']['lat'],
-                        'regionLng' => $respondent['region']['lng'],
-                        'placeName' => null,
-                        'lat' => 0,
-                        'lng' => 0,
-                        'twitID' => $datum['id'],
-                        'twitTime' => new Time($created_at),
-                        'twitUserID' => $datum['user']['id'],
-                        'twitUserScreenName' => $datum['user']['screen_name'],
-                        'info' => $datum['text'],
-                        'url' => null,
-                        'media' => null,
-                        'isImported' => 0,
-                        'active' => 1
-                    ];
-                    // if image do exists
-                    if (array_key_exists('extended_entities', $datum) &&
-                        array_key_exists('media', $datum['extended_entities']) &&
-                        $datum['extended_entities']['media'][0]['type'] == 'photo'
-                    ) {
-                        $dataToSave['media'] = $datum['extended_entities']['media'][0]['media_url_https'];
-                    }
-                    // if url do exists
-                    $twitURL = $this->findURLonText($info);
-                    if ($twitURL !== null) {
-                        $dataToSave['url'] = $twitURL;
-                        $info = str_ireplace($twitURL, "", $info);
-                        $info = trim($info);
-                    }
-                    $dataToSave['info'] = $info;
+                    if (!empty($respondent_id)) {
+                        $info = $datum['text'];
+                        $created_at = date("Y-m-d H:i:s", strtotime($datum['created_at']));
+                        Type::build('datetime')->useLocaleParser();//cakephp need this to save datetime field
+                        $dataToSave = [
+                            'respondent_id' => $respondent_id,
+                            'region_id' => $respondent['region_id'],
+                            'regionName' => $respondent['region']['name'],
+                            'regionLat' => $respondent['region']['lat'],
+                            'regionLng' => $respondent['region']['lng'],
+                            'placeName' => null,
+                            'lat' => 0,
+                            'lng' => 0,
+                            'twitID' => $datum['id'],
+                            'twitTime' => new Time($created_at),
+                            'twitUserID' => $datum['user']['id'],
+                            'twitUserScreenName' => $datum['user']['screen_name'],
+                            'info' => $datum['text'],
+                            'url' => null,
+                            'media' => null,
+                            'isImported' => 0,
+                            'active' => 1
+                        ];
+                        // if image do exists
+                        if (array_key_exists('extended_entities', $datum) &&
+                            array_key_exists('media', $datum['extended_entities']) &&
+                            $datum['extended_entities']['media'][0]['type'] == 'photo'
+                        ) {
+                            $dataToSave['media'] = $datum['extended_entities']['media'][0]['media_url_https'];
+                        }
+                        // if url do exists
+                        $twitURL = $this->findURLonText($info);
+                        if ($twitURL !== null) {
+                            $dataToSave['url'] = $twitURL;
+                            $info = str_ireplace($twitURL, "", $info);
+                            $info = trim($info);
+                        }
+                        $dataToSave['info'] = $info;
 
-                    // if get precise location
-                    if ($datum['geo'] !== null) {
-                        $dataToSave['lat'] = $datum['geo']['coordinates'][0];
-                        $dataToSave['lng'] = $datum['geo']['coordinates'][1];
-                    }
+                        // if get precise location
+                        if ($datum['geo'] !== null) {
+                            $dataToSave['lat'] = $datum['geo']['coordinates'][0];
+                            $dataToSave['lng'] = $datum['geo']['coordinates'][1];
+                        }
 
-                    // save twit to db
-                    $source = $this->Sources->newEntity($dataToSave);
-                    if ($this->Sources->save($source)) {
-                        $this->out(date('Y-m-d H:i:s') . ' succeed');
-                    } else {
-                        $this->out(date('Y-m-d H:i:s') . ' error occured');
+                        // save twit to db
+                        $source = $this->Sources->newEntity($dataToSave);
+                        if ($this->Sources->save($source)) {
+                            $this->out(date('Y-m-d H:i:s') . ' succeed');
+                        } else {
+                            $this->out(date('Y-m-d H:i:s') . ' error occured');
+                        }
                     }
                 }
-            }
+            }// foreach end here
         }
     }
 }
