@@ -67,74 +67,76 @@ class TwitterShell extends Shell
         // @todo better to return no data message after
         if ($countDataStream > 0) {
             foreach ($dataStream as $data) {
-                if ($data['place'] !== null) {
-                    $isTwitExists = $this->Markers->exists(['twitID' => $data['id'], 'active' => 1]);
-                    if (!$isTwitExists) {
-                        //first get respondent_id
-                        $respondent_id = $this->findToSaveRespondent($data['user']['id'], $data['user']['name'], $data['user']['screen_name']);
+                if ($data['user']['id'] !== 3458271384) { // nasi mandi user
+                    if ($data['place'] !== null) {
+                        $isTwitExists = $this->Markers->exists(['twitID' => $data['id'], 'active' => 1]);
+                        if (!$isTwitExists) {
+                            //first get respondent_id
+                            $respondent_id = $this->findToSaveRespondent($data['user']['id'], $data['user']['name'], $data['user']['screen_name']);
 
-                        $info = trim(str_replace('@dimanamacetid', '', $data['text']));
-                        $created_at = date("Y-m-d H:i:s", strtotime($data['created_at']));
-                        Type::build('datetime')->useLocaleParser();//cakephp need this to save datetime field
-                        $dataToSave = [
-                            //$dataToDisplay[] = [
-                            'category_id' => 1,//macet
-                            'user_id' => 4,//twitter robot
-                            'respondent_id' => $respondent_id,
-                            'weather_id' => 1,//cerah
-                            'twitID' => $data['id'],
-                            'twitTime' => new Time($created_at),//@todo this is not working, fix
-                            'twitURL' => null,
-                            'twitPlaceID' => $data['place']['id'],
-                            'twitPlaceName' => $data['place']['name'],
-                            'isTwitPlacePrecise' => 0,
-                            'twitImage' => null,
-                            'pinned' => 0,
-                            'cleared' => 0,
-                            'active' => 1
-                        ];
-                        // if image do exists
-                        if (array_key_exists('extended_entities', $data) &&
-                            array_key_exists('media', $data['extended_entities']) &&
-                            $data['extended_entities']['media'][0]['type'] == 'photo'
-                        ) {
-                            $dataToSave['twitImage'] = $data['extended_entities']['media'][0]['media_url_https'];
+                            $info = trim(str_replace('@dimanamacetid', '', $data['text']));
+                            $created_at = date("Y-m-d H:i:s", strtotime($data['created_at']));
+                            Type::build('datetime')->useLocaleParser();//cakephp need this to save datetime field
+                            $dataToSave = [
+                                //$dataToDisplay[] = [
+                                'category_id' => 1,//macet
+                                'user_id' => 4,//twitter robot
+                                'respondent_id' => $respondent_id,
+                                'weather_id' => 1,//cerah
+                                'twitID' => $data['id'],
+                                'twitTime' => new Time($created_at),//@todo this is not working, fix
+                                'twitURL' => null,
+                                'twitPlaceID' => $data['place']['id'],
+                                'twitPlaceName' => $data['place']['name'],
+                                'isTwitPlacePrecise' => 0,
+                                'twitImage' => null,
+                                'pinned' => 0,
+                                'cleared' => 0,
+                                'active' => 1
+                            ];
+                            // if image do exists
+                            if (array_key_exists('extended_entities', $data) &&
+                                array_key_exists('media', $data['extended_entities']) &&
+                                $data['extended_entities']['media'][0]['type'] == 'photo'
+                            ) {
+                                $dataToSave['twitImage'] = $data['extended_entities']['media'][0]['media_url_https'];
+                            }
+
+                            // if url do exists
+                            $twitURL = $this->findURLonText($info);
+                            if ($twitURL !== null) {
+                                $dataToSave['twitURL'] = $twitURL;
+                                $info = str_ireplace($twitURL, "", $info);
+                                $info = trim($info);
+                            }
+                            $dataToSave['info'] = $info;
+
+                            // category_id and weather_id based on twit
+                            //$twitHashtagCategoryWeather = $this->findHashtagonText($info);
+                            $twitHashtagCategoryWeather = $this->findHashtagonText($info, $data['entities']['hashtags']);
+                            $dataToSave['category_id'] = $twitHashtagCategoryWeather[0];
+                            $dataToSave['weather_id'] = $twitHashtagCategoryWeather[1];
+                            $dataToSave['info'] = $twitHashtagCategoryWeather[2];
+
+                            // if get precise location
+                            if ($data['geo'] !== null) {
+                                $dataToSave['lat'] = $data['geo']['coordinates'][0];
+                                $dataToSave['lng'] = $data['geo']['coordinates'][1];
+                                $dataToSave['isTwitPlacePrecise'] = 1;
+                            } else {
+                                $dataToSave['lat'] = $data['place']['bounding_box']['coordinates'][0][0][1];
+                                $dataToSave['lng'] = $data['place']['bounding_box']['coordinates'][0][0][0];
+                            }
+
+                            //$dataToDisplay[] = $dataToSave;
+
+                            //save marker
+                            $marker = $this->Markers->newEntity($dataToSave);
+                            $this->Markers->save($marker);
+
+                            // do retweet
+                            $this->retweet($data['id']);
                         }
-
-                        // if url do exists
-                        $twitURL = $this->findURLonText($info);
-                        if ($twitURL !== null) {
-                            $dataToSave['twitURL'] = $twitURL;
-                            $info = str_ireplace($twitURL, "", $info);
-                            $info = trim($info);
-                        }
-                        $dataToSave['info'] = $info;
-
-                        // category_id and weather_id based on twit
-                        //$twitHashtagCategoryWeather = $this->findHashtagonText($info);
-                        $twitHashtagCategoryWeather = $this->findHashtagonText($info, $data['entities']['hashtags']);
-                        $dataToSave['category_id'] = $twitHashtagCategoryWeather[0];
-                        $dataToSave['weather_id'] = $twitHashtagCategoryWeather[1];
-                        $dataToSave['info'] = $twitHashtagCategoryWeather[2];
-
-                        // if get precise location
-                        if ($data['geo'] !== null) {
-                            $dataToSave['lat'] = $data['geo']['coordinates'][0];
-                            $dataToSave['lng'] = $data['geo']['coordinates'][1];
-                            $dataToSave['isTwitPlacePrecise'] = 1;
-                        } else {
-                            $dataToSave['lat'] = $data['place']['bounding_box']['coordinates'][0][0][1];
-                            $dataToSave['lng'] = $data['place']['bounding_box']['coordinates'][0][0][0];
-                        }
-
-                        //$dataToDisplay[] = $dataToSave;
-
-                        //save marker
-                        $marker = $this->Markers->newEntity($dataToSave);
-                        $this->Markers->save($marker);
-
-                        // do retweet
-                        $this->retweet($data['id']);
                     }
                 }
             }
