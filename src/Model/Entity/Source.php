@@ -49,4 +49,17 @@ class Source extends Entity
         '*' => true,
         'id' => false,
     ];
+
+    /**
+     *
+     * Virtual Field
+     */
+    protected $_virtual = ['twitid_str'];
+
+    protected function _getTwitidStr()
+    {
+        $bigInt = gmp_init($this->_properties['twitID']);
+        $bigIntStr = gmp_strval($bigInt);
+        return $bigIntStr;
+    }
 }
