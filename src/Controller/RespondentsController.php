@@ -162,6 +162,12 @@ class RespondentsController extends AppController
                 ->buildOauth($url, $requestMethod)
                 ->performRequest();
 
+            $TwitterSurabaya = new TwitterAPIExchange($this->settingsTwitter);
+
+            $exec = $TwitterSurabaya->setPostfields($postfield)
+                ->buildOauth($url, $requestMethod)
+                ->performRequest();
+
             $message = 1;
         }
 

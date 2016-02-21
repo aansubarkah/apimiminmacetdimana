@@ -31,6 +31,13 @@ class TwitterShell extends Shell
         'consumer_secret' => 'RLfNT2AeaTZZKs7RAGJCreK12rvSh98jTpGeM2l5maPYHgMQiF'
     ];
 
+    public $settingsTwitterSurabaya = [
+        'oauth_access_token' => '3517023912-QTOGN1gw8l8yzOUsZeK1HYQU0erXLrmeZz2KLX5',
+        'oauth_access_token_secret' => 'cSxXX9ap0x6qbeeVsGnQyAtNuYFNVqj8MoiB39gIPTPhA',
+        'consumer_key' => 'lyxul6MCMZE6plA9S1rm4ypgn',
+        'consumer_secret' => 'EnKhl8ZI7VjZZkvJukemCUQdsTi5mP6KXR3vEUTCFFoZ3vC8AO'
+    ];
+
     public $baseTwitterUrl = 'https://api.twitter.com/1.1/';
 
     public $Markers = null;
@@ -282,7 +289,7 @@ class TwitterShell extends Shell
      *
      **/
     private function getTimeline($latestTwitID = 0, $howManyTweets = 200) {
-        $Twitter = new TwitterAPIExchange($this->settingsTwitter);
+        $Twitter = new TwitterAPIExchange($this->settingsTwitterSurabaya);
 
         $url = $this->baseTwitterUrl . 'statuses/home_timeline.json';
         $getfield = '?count=' . $howManyTweets;
