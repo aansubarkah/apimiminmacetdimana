@@ -125,6 +125,60 @@ class SourcesTable extends Table
             ->allowEmpty('media', 'create');
 
         $validator
+            ->allowEmpty('mediaWidth', 'create');
+
+        $validator
+            ->allowEmpty('mediaHeight', 'create');
+
+        $validator
+            ->allowEmpty('guessPlaceName', 'create');
+
+        $validator
+            ->allowEmpty('guessPlaceID', 'create');
+
+        $validator
+            ->add('guessPlaceLat', 'valid', ['rule' => 'numeric'])
+            ->requirePresence('guessPlaceLat', 'create')
+            ->notEmpty('guessPlaceLat');
+
+        $validator
+            ->add('guessPlaceLng', 'valid', ['rule' => 'numeric'])
+            ->requirePresence('guessPlaceLng', 'create')
+            ->notEmpty('guessPlaceLng');
+
+        $validator
+            ->allowEmpty('guessCategoryName', 'create');
+
+        $validator
+            ->allowEmpty('guessCategoryID', 'create');
+
+        $validator
+            ->allowEmpty('guessWeatherName', 'create');
+
+        $validator
+            ->allowEmpty('guessWeatherID', 'create');
+
+        $validator
+            ->add('isRelevant', 'valid', ['rule' => 'boolean'])
+            ->requirePresence('isRelevant', 'create')
+            ->notEmpty('isRelevant');
+
+        $validator
+            ->add('isGuessPlaceRight', 'valid', ['rule' => 'boolean'])
+            ->requirePresence('isGuessPlaceRight', 'create')
+            ->notEmpty('isGuessPlaceRight');
+
+        $validator
+            ->add('isGuessCategoryRight', 'valid', ['rule' => 'boolean'])
+            ->requirePresence('isGuessCategoryRight', 'create')
+            ->notEmpty('isGuessCategoryRight');
+
+        $validator
+            ->add('isGuessWeatherRight', 'valid', ['rule' => 'boolean'])
+            ->requirePresence('isGuessWeatherRight', 'create')
+            ->notEmpty('isGuessWeatherRight');
+
+        $validator
             ->add('isImported', 'valid', ['rule' => 'boolean'])
             ->requirePresence('isImported', 'create')
             ->notEmpty('isImported');

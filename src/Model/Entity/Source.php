@@ -30,6 +30,20 @@ use Cake\ORM\Entity;
  * @property string $info
  * @property string $url
  * @property string $media
+ * @property int $mediaWidth
+ * @property int $mediaHeight
+ * @property string $guessPlaceName
+ * @property int $guessPlaceID
+ * @property float $guessPlaceLat
+ * @property float $guessPlaceLng
+ * @property string $guessCategoryName
+ * @property int $guessCategoryID
+ * @property string $guessWeatherName
+ * @property int $guessWeatherID
+ * @property bool $isRelevant
+ * @property bool $isGuessPlaceRight
+ * @property bool $isGuessCategoryRight
+ * @property bool $isGuessWeatherName
  * @property bool $isImported
  * @property bool $active
  */

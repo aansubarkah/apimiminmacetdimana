@@ -365,24 +365,45 @@ class TwitterShell extends Shell
                             'info' => $datum['text'],
                             'url' => null,
                             'media' => null,
+                            'mediaWidth' => 0,
+                            'mediaHeight' => 0,
+                            'guessPlaceName' => null,
+                            'guessPlaceID' => 0,
+                            'guessPlaceLat' => 0,
+                            'guessPlaceLng' => 0,
+                            'guessCategoryName' => 'Lancar',
+                            'guessCategoryID' => 3,
+                            'guessWeatherName' => 'Cerah',
+                            'guessWeatherID' => 1,
+                            'isRelevant' => 1,
+                            'isGuessPlaceRight' => 0,
+                            'isGuessCategoryRight' => 0,
+                            'isGuessWeatherRight' => 0,
                             'isImported' => 0,
                             'active' => 1
                         ];
                         // if image do exists
-                        if (array_key_exists('extended_entities', $datum) &&
-                            array_key_exists('media', $datum['extended_entities']) &&
-                            $datum['extended_entities']['media'][0]['type'] == 'photo'
+                        if (array_key_exists('entities', $datum) &&
+                            array_key_exists('media', $datum['entities']) &&
+                            $datum['entities']['media'][0]['type'] == 'photo'
                         ) {
-                            $dataToSave['media'] = $datum['extended_entities']['media'][0]['media_url_https'];
+                            $dataToSave['media'] = $datum['entities']['media'][0]['media_url_https'];
+                            $dataToSave['mediaWidth'] = $datum['entities']['media'][0]['sizes']['small']['w'];
+                            $dataToSave['mediaHeight'] = $datum['entities']['media'][0]['sizes']['small']['h'];
                         }
                         // if url do exists
-                        $twitURL = $this->findURLonText($info);
+                        if (array_key_exists('entities', $datum) &&
+                            array_key_exists('urls', $datum['entities'])
+                        ) {
+                            $dataToSave['url'] = $datum['entities']['urls'][0]['url'];
+                        }
+                        /*$twitURL = $this->findURLonText($info);
                         if ($twitURL !== null) {
                             $dataToSave['url'] = $twitURL;
                             $info = str_ireplace($twitURL, "", $info);
                             $info = trim($info);
-                        }
-                        $dataToSave['info'] = $info;
+                        }*/
+                        //$dataToSave['info'] = $info;
 
                         // if get precise location
                         if ($datum['geo'] !== null) {
