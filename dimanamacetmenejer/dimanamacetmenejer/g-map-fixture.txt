@@ -1,0 +1,76 @@
+//-------------- on ember-cli-g-maps/addon/mixins/g-maps/routes.js -----------------------
+import Ember           from 'ember';
+import childCollection from 'ember-cli-g-maps/utils/g-maps/child-collection';
+
+const { isArray } = Ember;
+
+export default Ember.Mixin.create(
+	childCollection.create({
+		model: 'routes',
+
+		namespace: 'route',
+
+		/* Supported:
+		 props: [
+		 'clickable',
+		 'draggable',
+		 'editable',
+		 'fillColor',
+		 'fillOpacity',
+		 'geodesic',
+		 'paths',
+		 'strokeColor',
+		 'strokeOpacity',
+		 'strokePosition',
+		 'strokeWeight',
+		 'visible',
+		 'zIndex'
+		 ],
+
+		 events: [
+		 'click',
+		 'rightclick',
+		 'dblclick',
+		 'drag',
+		 'dragend',
+		 'dragstart',
+		 'mousedown',
+		 'mouseout',
+		 'mouseover',
+		 'mouseup',
+		 'mousemove'
+		 ],
+		 */
+
+		validate: function () {
+			const routes = this.get('routes');
+
+			//if (!routes) {
+			//	return;
+			//} // validation not necessary
+
+			if (routes && !isArray(routes)) {
+				throw new Error('g-maps component expects routes to be an Ember Array');
+			}
+
+			// End validation
+			//if(!routes[0] || !routes[0].paths || !routes[0].paths[0]) { return; }
+
+			// Reminder for well formed polygon paths
+			//if(!isArray(routes[0].paths[0])) {
+			//	throw new Error('g-maps polygon paths expects Array of Arrays: [[lat, lng]]');
+			//}
+		}
+	})
+);
+/**
+ * Created by aan on 25/08/15.
+ */
+
+//-------------- on ember-cli-g-maps/addon/components/g-maps.js -----------------------
+import GMapRoutes 		from 'ember-cli-g-maps/mixins/g-maps/routes';
+
+const { on, merge, uuid, computed, observer } = Ember;
+const { later } = Ember.run;
+
+export default Ember.Component.extend(Ember.Evented, GMapMarkers, GMapPolygons, GMapCircles, GMapPolylines, GMapRoutes, {

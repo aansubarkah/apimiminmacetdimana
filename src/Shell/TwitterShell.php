@@ -328,7 +328,7 @@ class TwitterShell extends Shell
             ->first();
 
         if ($getLatestTwitID['twitID'] > 0) {
-            $latestTwitID = $getLatestTwitID['twitID'];
+            $latestTwitID = $getLatestTwitID['twitID'] + 1;
         } else {
             $latestTwitID = 1;
         }
