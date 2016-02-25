@@ -4,19 +4,14 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * Region Entity.
+ * Hierarchy Entity.
  *
  * @property int $id
- * @property float $lat
- * @property float $lng
  * @property string $name
  * @property bool $active
- * @property \App\Model\Entity\User[] $users
- * @property \App\Model\Entity\Respondent[] $respondents
- * @property \App\Model\Entity\Source[] $sources
  * @property \App\Model\Entity\Regency[] $regencies
  */
-class Region extends Entity
+class Hierarchy extends Entity
 {
 
     /**

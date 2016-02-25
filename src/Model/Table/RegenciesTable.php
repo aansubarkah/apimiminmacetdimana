@@ -1,21 +1,20 @@
 <?php
 namespace App\Model\Table;
 
-use App\Model\Entity\Region;
+use App\Model\Entity\Regency;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
 /**
- * Regions Model
+ * Regencies Model
  *
- * @property \Cake\ORM\Association\HasMany $Users
- * @property \Cake\ORM\Association\HasMany $Respondents
- * @property \Cake\ORM\Association\HasMany $Sources
- * @property \Cake\ORM\Association\HasMany $Regencies
+ * @property \Cake\ORM\Association\BelongsTo $States
+ * @property \Cake\ORM\Association\BelongsTo $Hierarchies
+ * @property \Cake\ORM\Association\BelongsTo $Regions
  */
-class RegionsTable extends Table
+class RegenciesTable extends Table
 {
 
     /**
@@ -28,23 +27,22 @@ class RegionsTable extends Table
     {
         parent::initialize($config);
 
-        $this->table('regions');
+        $this->table('regencies');
         $this->displayField('name');
         $this->primaryKey('id');
 
-        $this->hasMany('Users', [
-            'foreignKey' => 'region_id'
+        $this->belongsTo('States', [
+            'foreignKey' => 'state_id',
+            'joinType' => 'INNER'
         ]);
-        $this->hasMany('Respondents', [
-            'foreignKey' => 'region_id'
+        $this->belongsTo('Hierarchies', [
+            'foreignKey' => 'hierarchy_id',
+            'joinType' => 'INNER'
         ]);
-        $this->hasMany('Sources', [
-            'foreignKey' => 'region_id'
+        $this->belongsTo('Regions', [
+            'foreignKey' => 'region_id',
+            'joinType' => 'INNER'
         ]);
-        $this->hasMany('Regencies', [
-            'foreignKey' => 'region_id'
-        ]);
-
     }
 
     /**
@@ -60,6 +58,10 @@ class RegionsTable extends Table
             ->allowEmpty('id', 'create');
 
         $validator
+            ->requirePresence('name', 'create')
+            ->notEmpty('name');
+
+        $validator
             ->add('lat', 'valid', ['rule' => 'numeric'])
             ->requirePresence('lat', 'create')
             ->notEmpty('lat');
@@ -70,14 +72,25 @@ class RegionsTable extends Table
             ->notEmpty('lng');
 
         $validator
-            ->requirePresence('name', 'create')
-            ->notEmpty('name');
-
-        $validator
             ->add('active', 'valid', ['rule' => 'boolean'])
             ->requirePresence('active', 'create')
             ->notEmpty('active');
 
         return $validator;
+    }
+
+    /**
+     * Returns a rules checker object that will be used for validating
+     * application integrity.
+     *
+     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
+     * @return \Cake\ORM\RulesChecker
+     */
+    public function buildRules(RulesChecker $rules)
+    {
+        $rules->add($rules->existsIn(['state_id'], 'States'));
+        $rules->add($rules->existsIn(['hierarchy_id'], 'Hierarchies'));
+        $rules->add($rules->existsIn(['region_id'], 'Regions'));
+        return $rules;
     }
 }

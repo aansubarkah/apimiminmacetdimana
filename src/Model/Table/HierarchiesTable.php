@@ -1,21 +1,18 @@
 <?php
 namespace App\Model\Table;
 
-use App\Model\Entity\Region;
+use App\Model\Entity\Hierarchy;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
 /**
- * Regions Model
+ * Hierarchies Model
  *
- * @property \Cake\ORM\Association\HasMany $Users
- * @property \Cake\ORM\Association\HasMany $Respondents
- * @property \Cake\ORM\Association\HasMany $Sources
  * @property \Cake\ORM\Association\HasMany $Regencies
  */
-class RegionsTable extends Table
+class HierarchiesTable extends Table
 {
 
     /**
@@ -28,23 +25,13 @@ class RegionsTable extends Table
     {
         parent::initialize($config);
 
-        $this->table('regions');
+        $this->table('hierarchies');
         $this->displayField('name');
         $this->primaryKey('id');
 
-        $this->hasMany('Users', [
-            'foreignKey' => 'region_id'
-        ]);
-        $this->hasMany('Respondents', [
-            'foreignKey' => 'region_id'
-        ]);
-        $this->hasMany('Sources', [
-            'foreignKey' => 'region_id'
-        ]);
         $this->hasMany('Regencies', [
-            'foreignKey' => 'region_id'
+            'foreignKey' => 'hierarchy_id'
         ]);
-
     }
 
     /**
@@ -58,16 +45,6 @@ class RegionsTable extends Table
         $validator
             ->add('id', 'valid', ['rule' => 'numeric'])
             ->allowEmpty('id', 'create');
-
-        $validator
-            ->add('lat', 'valid', ['rule' => 'numeric'])
-            ->requirePresence('lat', 'create')
-            ->notEmpty('lat');
-
-        $validator
-            ->add('lng', 'valid', ['rule' => 'numeric'])
-            ->requirePresence('lng', 'create')
-            ->notEmpty('lng');
 
         $validator
             ->requirePresence('name', 'create')
