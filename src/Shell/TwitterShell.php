@@ -323,7 +323,7 @@ class TwitterShell extends Shell
         // first get the latest twitID from DB
         $getLatestTwitID = $this->Sources->find()
             ->select(['twitID'])
-            ->where(['active' => true])
+            //->where(['active' => true])
             ->order(['twitID' => 'DESC'])
             ->first();
 
