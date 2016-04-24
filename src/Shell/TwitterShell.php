@@ -170,6 +170,18 @@ class TwitterShell extends Shell
             case 'lancar':
                 $category_id = 3;
                 break;
+            case 'kecelakaan':
+                $category_id = 4;
+                break;
+            case 'laka':
+                $category_id = 4;
+                break;
+            case 'waspada':
+                $category_id = 5;
+                break;
+            case 'ramai':
+                $category_id = 6;
+                break;
             case 'mendung':
                 $weather_id = 2;
                 break;
